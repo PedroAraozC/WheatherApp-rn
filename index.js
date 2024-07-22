@@ -6,7 +6,8 @@ import {
   StyleSheet,
   ActivityIndicator,
   ScrollView,
-  refreshControl
+  refreshControl,
+  RefreshControl,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import * as Location from "expo-location";
@@ -57,16 +58,35 @@ const Weather = () => {
     );
   }
 
-
-  const current = forecast.current.weather[0]
+  const current = forecast.current.weather[0];
 
   return (
     <SafeAreaView style={styles.container}>
-    <ScrollView refreshControl={}>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={() => loadForecast()}
+          />
+        }
+        style={{ marginTop: 50 }}
+      >
+        <Text style={styles.title}>Current Weather</Text>{" "}
+        <Text style={{ alignItems: "center", textAlign: "center" }}>
+          Your Location
+        </Text>
 
-    </ScrollView>
-  </SafeAreaView>
+        <View>
+
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 export default Weather;
+
+
+const styles = StyleSheet.create({
+    
+})
