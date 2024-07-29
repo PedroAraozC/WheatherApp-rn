@@ -8,18 +8,19 @@ import {
   ScrollView,
   RefreshControl,
   Image,
+  Dimensions,
+  FlatList,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import * as Location from "expo-location";
-import { APIKEY } from '@babel/core';
+// import { APIKEY } from '@babel/core';
 
-const openWeatherKey =  APIKEY;
+const openWeatherKey = "a1cd95af7f3524240c00c116e9261781";
 
 const Weather = () => {
   const [forecast, setForecast] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
 
-  // "a1cd95af7f3524240c00c116e9261781"
   const loadForecast = async () => {
     setRefreshing(true);
     // PREGUNTA POR PERMISOS DE UBICACION
@@ -44,6 +45,7 @@ const Weather = () => {
     const response = await fetch(fullUrl);
     const data = await response.json(); // convierte la respuesta en un json
     console.log("response", data.main);
+    console.log("data", data)
 
     if (!response.ok) {
       Alert.alert("Error", "Algo salió mal :("); // si no esta todo ok, muestra la alerta
@@ -56,6 +58,8 @@ const Weather = () => {
   useEffect(() => {
     loadForecast();
   }, []);
+
+
 
   if (!forecast) {
     return (
@@ -106,6 +110,67 @@ const Weather = () => {
         </View>
         <View style={styles.descriptionCont}>
           <Text style={styles.description}>{currentWeather.description}</Text>
+          <View style={styles.extraInfo}>
+            <View style={styles.info}>
+              <Image
+                source={require("./assets/temp.png")}
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 40 / 2,
+                  tintColor: "lightblue",
+                  // marginLeft: 50,
+                }}
+              />
+              <Text style={styles.text}>{forecast.main.feels_like}ºC</Text>
+              <Text style={styles.text}>Sensacion termica</Text>
+            </View>
+            <View style={styles.info}>
+              <Image
+                source={require("./assets/humedad.png")}
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 40 / 2,
+                  tintColor: "lightblue",
+                  // marginLeft: 50,
+                }}
+              />
+              <Text style={styles.text}>{forecast.main.humidity}%</Text>
+              <Text style={styles.text}>Humedad</Text>
+            </View>
+          </View>
+          {/* <View>
+<Text>
+  Pronóstico por hora
+</Text>
+          </View> */}
+
+    {/*---------------------------Version paga---------------------------*/}
+          <FlatList
+            horizontal
+            data={forecast.hourly?.slice(0, 24)}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={(hour) => {
+              const weather = hour.item.weather[0];
+              var dt = new Date(hour.item.dt * 1000);
+              return (
+                <View style={styles.hour}>
+                  <Text style={{ fontWeight: "bold", color: "#346751" }}>
+                    {dt.toLocaleTimeString().replace(/:\d+ /, "")}
+                  </Text>
+                  <Text style={{ fontWeight: "bold", color: "#346751" }}>
+                    {Math.round(hour.item.temp)}ºC
+                  </Text>
+                  <Image style={styles.smallIcon}
+                  source={{uri:`http://openweathermap.org/img/wn/${weather.icon}@2x.png`}}/>
+                  <Text style={{fontWeight:'bold', color:'#346751'}}>{weather.description}</Text>
+                </View>
+              );
+            }}
+          />
+    {/*---------------------------Version paga---------------------------*/}
+
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -154,9 +219,44 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 20,
     fontWeight: "bold",
-    textAlign:"center"
+    textAlign: "center",
   },
   descriptionCont: {
     marginBottom: 25,
   },
+  info: {
+    width: Dimensions.get("screen").width / 2.5,
+    backgroundColor: "rgba(0,0,0,0.25)",
+    padding: 10,
+    borderRadius: 15,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  extraInfo: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginTop: 20,
+    padding: 10,
+  },
+  text: {
+    fontSize: 18,
+    color: "#ffffff",
+    textAlign: "center",
+    alignItems: "center",
+  },
+  subtitle:{
+    fontSize:24,
+    marginVertical:12,
+    marginLeft:7,
+    color:'C84B31',
+    fontWeight:'bold'
+  },
+  hour:{
+    padding:6,
+    alignItems:'center',
+  },
+  smallIcon:{
+    width:100,
+    height:100
+  }
 });

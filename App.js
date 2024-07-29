@@ -1,11 +1,12 @@
 
 import { StyleSheet, View } from 'react-native';
 import Weather from './index';
+import AppNavigation from './navigation/appNavigation';
 
 export default function App() {
   return (
     <View style={styles.container}>
-      <Weather/>
+      <AppNavigation/>
     </View>
   );
 }
